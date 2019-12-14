@@ -11,6 +11,7 @@
 
 FROM clearlinux:latest
 ADD dockerrun.sh /dockerrun.sh
-RUN swupd update && swupd bundle-add c-basic dev-utils-dev
+RUN swupd bundle-add os-core-update-dev c-basic dev-utils-dev
+RUN swupd update
 
 CMD ["/dockerrun.sh"]

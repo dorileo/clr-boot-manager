@@ -13,6 +13,7 @@
 DIRN="$(basename $(pwd))"
 PROJ_NAME="clr-boot-manager"
 PROJ_CI_NAME="docker-ci-${PROJ_NAME}"
+FORCE_BUILD=${FORCE_BUILD:-"false"}
 
 # Check docker is available
 if ! type docker &>/dev/null; then
@@ -33,7 +34,7 @@ if [[ "${DIRN}" != "${PROJ_NAME}" ]]; then
 fi
 
 # Check that docker-ci image is installed
-if ! docker inspect "${PROJ_CI_NAME}" &>/dev/null; then
+if ! docker inspect "${PROJ_CI_NAME}" || "$FORCE_BUILD" = "true" &>/dev/null; then
     echo "${PROJ_CI_NAME} not installed, building docker image.."
     echo "....Please wait, this may take some time."
     docker build -t "${PROJ_CI_NAME}" docker/ || exit 1

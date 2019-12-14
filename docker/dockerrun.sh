@@ -20,34 +20,4 @@ fi
 # Copy all the files across to prevent contaminating the bind mount
 cp -Ra /source/. /build
 
-die_fatal()
-{
-    exit 1
-}
-
-die_log_fatal()
-{
-    if [[ -e test-suite.log ]]; then
-        cat test-suite.log
-    else
-        echo "test-suite.log is missing." >&2
-    fi
-    exit 1
-}
-
-./autogen.sh --enable-coverage || die_fatal
-
-# Build error
-make || die_fatal
-
-# Test suite failure, print the log
-make check || die_log_fatal
-
-# tarbal issue, just die
-make distcheck || die_fatal
-
-# Actually checkable on host, but dump log anyway
-make check-valgrind || die_log_fatal
-
-# At this point, we can emit our current coverage to the tty
-make coverage
+./scripts/run-test-suite.sh || exit 1
