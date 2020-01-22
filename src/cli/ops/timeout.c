@@ -93,7 +93,7 @@ bool cbm_command_set_timeout(int argc, char **argv)
                 fprintf(stdout, "New timeout value is: %d\n", n_val);
         }
 
-        return cbm_command_update(argc, argv);
+        return cbm_command_update_do(manager);
 }
 
 bool cbm_command_get_timeout(int argc, char **argv)

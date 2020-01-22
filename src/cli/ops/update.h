@@ -11,9 +11,11 @@
 
 #pragma once
 
+#include "bootman.h"
 #include "cli.h"
 
 bool cbm_command_update(int argc, char **argv);
+bool cbm_command_update_do(BootManager *manager);
 
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html

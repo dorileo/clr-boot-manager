@@ -20,6 +20,7 @@
 #include "cli.h"
 #include "log.h"
 #include "nica/files.h"
+#include "update.h"
 
 bool cbm_command_update(int argc, char **argv)
 {
@@ -40,10 +41,19 @@ bool cbm_command_update(int argc, char **argv)
 
         boot_manager_set_update_efi_vars(manager, update_efi_vars);
         
+        return cbm_command_update_do(manager);
+}
+
+bool cbm_command_update_do(BootManager *manager)
+{
+        autofree(char) *root = NULL;
+        bool forced_image = false;
+
         if (!boot_manager_detect_kernel_dir(root)) {
                 fprintf(stderr, "No kernels detected on system to update\n");
                 return true;
         }
+
         if (root) {
                 autofree(char) *realp = NULL;
 
