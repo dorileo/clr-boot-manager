@@ -92,7 +92,7 @@ char *get_boot_device()
         autofree(char) *glob_path = NULL;
         autofree(char) *dev_path = NULL;
 
-        glob_path = string_printf("%s/firmware/efi/efivars/LoaderDevicePartUUID*",
+        glob_path = string_printf("%s/firmware/efi/efivars/LoaderDevicePartUUID-*",
                                   cbm_system_get_sysfs_path());
 
         glob(glob_path, GLOB_DOOFFS, NULL, &glo);
