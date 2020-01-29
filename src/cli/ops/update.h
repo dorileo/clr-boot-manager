@@ -15,7 +15,7 @@
 #include "cli.h"
 
 bool cbm_command_update(int argc, char **argv);
-bool cbm_command_update_do(BootManager *manager);
+bool cbm_command_update_do(BootManager *manager, char *root, bool forced_image);
 
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html

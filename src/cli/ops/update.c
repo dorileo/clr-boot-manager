@@ -41,14 +41,11 @@ bool cbm_command_update(int argc, char **argv)
 
         boot_manager_set_update_efi_vars(manager, update_efi_vars);
         
-        return cbm_command_update_do(manager);
+        return cbm_command_update_do(manager, root, forced_image);
 }
 
-bool cbm_command_update_do(BootManager *manager)
+bool cbm_command_update_do(BootManager *manager, char *root, bool forced_image)
 {
-        autofree(char) *root = NULL;
-        bool forced_image = false;
-
         if (!boot_manager_detect_kernel_dir(root)) {
                 fprintf(stderr, "No kernels detected on system to update\n");
                 return true;
