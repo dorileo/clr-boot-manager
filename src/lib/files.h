@@ -181,6 +181,11 @@ bool cbm_path_check(const char *path, const char *resolved);
 bool cbm_is_dir_empty(const char *path);
 
 /**
+ * Check if @path exists and if it's empty.
+ */
+bool cbm_file_has_content(char *path);
+
+/**
  * Ensure a stack pointer vs a heap pointer, to save on copies
  */
 #define CBM_MAPPED_FILE_INIT &(CbmMappedFile){ 0 };

@@ -194,7 +194,7 @@ static bool extlinux_set_default_kernel(const BootManager *manager, const Kernel
         }
 
         /* If the file is the same, don't write it again or sync */
-        if (file_get_text(config_path, &old_conf)) {
+        if (cbm_file_has_content(config_path) && file_get_text(config_path, &old_conf)) {
                 if (streq(old_conf, writer->buffer)) {
                         return true;
                 }

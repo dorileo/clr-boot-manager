@@ -169,6 +169,32 @@ static bool get_parent_disk_devno(char *path, dev_t *diskdevno)
         return true;
 }
 
+bool cbm_file_has_content(char *path)
+{
+        int fd = -1;
+        struct stat st = { 0 };
+        ssize_t length = -1;
+
+        if (!nc_file_exists(path)) {
+                return false;
+        }
+
+        fd = open(path, O_RDONLY);
+        if (fd < 0) {
+                return false;
+        }
+
+        if (fstat(fd, &st) != 0) {
+                close(fd);
+                return false;
+        }
+
+        length = st.st_size;
+        close(fd);
+
+        return length != 0;
+}
+
 char *get_parent_disk(char *path)
 {
         dev_t devt;
