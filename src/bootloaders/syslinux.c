@@ -82,7 +82,7 @@ static bool syslinux_init(const BootManager *manager)
 
         // syslinux -U will not work with a partuuid, the effect of "install" and
         // "update" will always be the same, so assume install for all scenarios
-        syslinux_cmd = string_printf("%s/usr/bin/syslinux -i %s &> /dev/null",
+        syslinux_cmd = string_printf("%s/usr/bin/syslinux-nomtools -i %s &> /dev/null",
                                      prefix, boot_device);
 
         partition_index = get_partition_index(prefix, boot_device);
