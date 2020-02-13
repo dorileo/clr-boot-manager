@@ -11,14 +11,51 @@
 #
 set -e
 
+pkg="clr-boot-manager"
+
+print_help() {
+    echo -e "mkrelease.sh [--help] [options]
+
+mkrelease.sh executes all the required steps before cutting a new release(set
+new version, creates bundled artifacts including vendored components, creates
+the release tag etc).
+
+Help Options:
+    -h, --help		Show this help list
+
+Options:
+    -n, --new-version	The release's new version"
+}
+
+for curr in "$@"; do
+    case $curr in
+	"--new-version"|"-n")
+	    version=$2
+	    shift
+	    shift
+	    ;;
+	"--help"|"-h")
+	    print_help;
+	    exit 0;;
+    esac
+done
+
+if [ "$version" == "" ]; then
+    echo "No version provided, please use \"--new-version\" flag. Use --help for more information."
+fi
+
+echo "${version}" > VERSION
+git commit -a -s -m "v${version} release"
+git tag "v${version}"
+
 git submodule init
 git submodule update
 
-VERSION=$(cat ./VERSION)
-NAME="clr-boot-manager"
-./scripts/git-archive-all.sh --format tar --prefix ${NAME}-${VERSION}/ --verbose -t HEAD ${NAME}-${VERSION}.tar
-xz -9 "${NAME}-${VERSION}.tar"
+./scripts/git-archive-all.sh --format tar --prefix ${pkg}-${version}/ \
+			     --verbose -t "v${version}" ${pkg}-${version}.tar
+
+xz -9 "${pkg}-${version}.tar"
 
 # Automatically sign the tarball
-gpg --armor --detach-sign "${NAME}-${VERSION}.tar.xz"
-gpg --verify "${NAME}-${VERSION}.tar.xz.asc"
+gpg --armor --detach-sign "${pkg}-${version}.tar.xz"
+gpg --verify "${pkg}-${version}.tar.xz.asc"
