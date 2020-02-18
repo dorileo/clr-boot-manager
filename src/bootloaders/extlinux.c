@@ -35,32 +35,43 @@
 static KernelArray *kernel_queue = NULL;
 static char *extlinux_cmd = NULL;
 static char *base_path = NULL;
+static char *sgdisk_cmd = NULL;
 
 static bool extlinux_init(const BootManager *manager)
 {
         autofree(char) *ldlinux = NULL;
         const char *prefix = NULL;
         autofree(char) *boot_device = NULL;
+        autofree(char) *parent_disk = NULL;
+        int partition_index;
 
         if (kernel_queue) {
                 kernel_array_free(kernel_queue);
         }
+
         kernel_queue = nc_array_new();
         if (!kernel_queue) {
                 DECLARE_OOM();
                 abort();
         }
+
         if (base_path) {
                 free(base_path);
                 base_path = NULL;
         }
-        base_path = boot_manager_get_boot_dir((BootManager *)manager);
-        OOM_CHECK_RET(base_path, false);
 
         if (extlinux_cmd) {
                 free(extlinux_cmd);
                 extlinux_cmd = NULL;
         }
+
+        if (sgdisk_cmd) {
+                free(sgdisk_cmd);
+                sgdisk_cmd = NULL;
+        }
+
+        base_path = boot_manager_get_boot_dir((BootManager *)manager);
+        OOM_CHECK_RET(base_path, false);
 
         ldlinux = string_printf("%s/ldlinux.sys", base_path);
 
@@ -77,7 +88,21 @@ static bool extlinux_init(const BootManager *manager)
         extlinux_cmd = string_printf("%s/usr/bin/extlinux -i %s --device %s &> /dev/null",
                                      prefix, base_path, boot_device);
 
+        partition_index = get_partition_index(prefix, boot_device);
+        CHECK_ERR_RET_VAL(partition_index == -1, false, "Failed to get partition index");
+
+        parent_disk = get_parent_disk((char *)prefix);
+        CHECK_ERR_GOTO(!parent_disk, cleanup, "Failed to get parent disk");
+
+        sgdisk_cmd = string_printf("%s/usr/bin/sgdisk %s --attributes=%d:set:2",
+                                   prefix, parent_disk, partition_index + 1);
+
         return true;
+
+ cleanup:
+        free(extlinux_cmd);
+        extlinux_cmd = NULL;
+        return false;
 }
 
 /* Queue kernel to be added to conf */
@@ -256,6 +281,9 @@ static bool extlinux_install(const BootManager *manager)
         CHECK_ERR_RET_VAL(cbm_system_system(extlinux_cmd) != 0, false,
                           "cbm_system_system() returned value != 0");
 
+        CHECK_ERR_RET_VAL(cbm_system_system(sgdisk_cmd) != 0, false,
+                          "Failed to run sgdisk command: %s", sgdisk_cmd);
+
         cbm_sync();
         return true;
 
@@ -284,6 +312,10 @@ static void extlinux_destroy(__cbm_unused__ const BootManager *manager)
         if (extlinux_cmd) {
                 free(extlinux_cmd);
                 extlinux_cmd = NULL;
+        }
+        if (sgdisk_cmd) {
+                free(sgdisk_cmd);
+                sgdisk_cmd = NULL;
         }
         if (base_path) {
                 free(base_path);
