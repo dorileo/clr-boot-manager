@@ -258,6 +258,16 @@ bool boot_manager_install_kernel(BootManager *manager, const Kernel *kernel);
 char *boot_manager_get_boot_dir(BootManager *manager);
 
 /**
+ * Return the bootloader private data
+ */
+void *boot_manager_get_data(BootManager *manager);
+
+/**
+ * Set the bootloader's private data
+ */
+void boot_manager_set_data(BootManager *manager, void *data);
+
+/**
  * Attempt to uninstall a previously installed kernel
  *
  * @param kernel A valid kernel instance

@@ -648,6 +648,16 @@ bool boot_manager_set_boot_dir(BootManager *self, const char *bootdir)
         return true;
 }
 
+void *boot_manager_get_data(BootManager *manager)
+{
+        return manager->data;
+}
+
+void boot_manager_set_data(BootManager *manager, void *data)
+{
+        manager->data = data;
+}
+
 bool boot_manager_modify_bootloader(BootManager *self, int flags)
 {
         assert(self != NULL);
