@@ -131,7 +131,9 @@ bool syslinux_common_set_default_kernel(const BootManager *manager, const Kernel
                 initrd_paths[0] = '\0';
 
                 /* Mark it default */
-                if (default_kernel && streq(k->source.path, default_kernel->source.path)) {
+                if (default_kernel && streq(k->meta.ktype, default_kernel->meta.ktype) &&
+                    streq(k->meta.version, default_kernel->meta.version) &&
+                    k->meta.release == default_kernel->meta.release) {
                         cbm_writer_append_printf(writer, "DEFAULT %s\n", k->target.legacy_path);
                 }
 
@@ -247,7 +249,12 @@ bool syslinux_common_init(const BootManager *manager, command_writer writer)
                 kernel_array_free(ctx->kernel_queue);
         }
 
-        ctx->kernel_queue = nc_array_new();
+        if (getenv("CBM_BOOTVAR_TEST_MODE")) {
+                ctx->kernel_queue = nc_array_new();
+        } else {
+                ctx->kernel_queue = boot_manager_get_kernels((BootManager *)manager);
+        }
+
         if (!ctx->kernel_queue) {
                 DECLARE_OOM();
                 abort();
