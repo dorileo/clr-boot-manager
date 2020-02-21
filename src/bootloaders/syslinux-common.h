@@ -20,6 +20,11 @@ struct SyslinuxContext {
 
 typedef bool (*command_writer)(struct SyslinuxContext *ctx, const char *prefix, char *boot_device);
 
+/**
+ * Common implementation of get_default_kernel for both syslinux and extlinux
+ */
+char *syslinux_common_get_default_kernel(const BootManager *manager);
+
 /* Queue kernel to be added to conf */
 bool syslinux_common_install_kernel(const BootManager *manager, const Kernel *kernel);
 

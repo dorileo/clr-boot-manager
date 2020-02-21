@@ -52,11 +52,6 @@ static bool extlinux_remove_kernel(__cbm_unused__ const BootManager *manager,
         return true;
 }
 
-char *extlinux_get_default_kernel(__cbm_unused__ const BootManager *manager)
-{
-        return NULL;
-}
-
 static bool extlinux_needs_update(__cbm_unused__ const BootManager *manager)
 {
         return true;
@@ -102,7 +97,7 @@ __cbm_export__ const BootLoader extlinux_bootloader = {.name = "extlinux",
                                                        .set_default_kernel =
                                                            syslinux_common_set_default_kernel,
                                                        .get_default_kernel =
-                                                           extlinux_get_default_kernel,
+                                                           syslinux_common_get_default_kernel,
                                                        .needs_install = extlinux_needs_install,
                                                        .needs_update = extlinux_needs_update,
                                                        .install = syslinux_common_install,

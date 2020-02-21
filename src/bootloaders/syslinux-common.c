@@ -9,8 +9,12 @@
  * of the License, or (at your option) any later version.
  */
 
+#define _GNU_SOURCE
+
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -22,6 +26,51 @@
 #include "syslinux-common.h"
 #include "system_stub.h"
 #include "writer.h"
+
+#define CONFIG_FILE "syslinux.cfg"
+
+char *syslinux_common_get_default_kernel(const BootManager *manager)
+{
+        autofree(char) *config_path = NULL;
+        autofree(FILE) *f = NULL;
+        char *result = NULL;
+        char *buf = NULL;
+        size_t len, lplen = 0;
+        ssize_t read;
+        char *lookup = "DEFAULT ";
+        struct SyslinuxContext *ctx = NULL;
+
+        ctx = boot_manager_get_data((BootManager *)manager);
+
+        lplen = strlen(lookup);
+        config_path = string_printf("%s/"CONFIG_FILE, ctx->base_path);
+
+        f = fopen(config_path, "r");
+        CHECK_ERR_RET_VAL(!f, NULL, "Could not open config file: %s", config_path);
+
+        while ((read = getline(&buf, &len, f)) != -1) {
+                char *tk;
+                size_t reslen;
+
+                tk = strstr(buf, lookup);
+                if (tk != NULL) {
+                        result = strndup(tk+lplen, strlen(tk)-lplen);
+                        reslen = strlen(result);
+
+                        if (result[reslen-1] == '\n') {
+                                result[reslen-1] = '\0';
+                        }
+
+                        break;
+                }
+        }
+
+        if (buf)  {
+                free(buf);
+        }
+
+        return result;
+}
 
 bool syslinux_common_install_kernel(const BootManager *manager, const Kernel *kernel)
 {
@@ -63,7 +112,7 @@ bool syslinux_common_set_default_kernel(const BootManager *manager, const Kernel
                 return false;
         }
 
-        config_path = string_printf("%s/syslinux.cfg", ctx->base_path);
+        config_path = string_printf("%s/"CONFIG_FILE, ctx->base_path);
 
         if (!cbm_writer_open(writer)) {
                 DECLARE_OOM();

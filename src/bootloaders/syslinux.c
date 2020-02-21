@@ -55,11 +55,6 @@ static bool syslinux_remove_kernel(__cbm_unused__ const BootManager *manager,
         return true;
 }
 
-char *syslinux_get_default_kernel(__cbm_unused__ const BootManager *manager)
-{
-        return NULL;
-}
-
 static bool syslinux_needs_update(__cbm_unused__ const BootManager *manager)
 {
         return true;
@@ -104,7 +99,7 @@ __cbm_export__ const BootLoader syslinux_bootloader = {.name = "syslinux",
                                                        .set_default_kernel =
                                                            syslinux_common_set_default_kernel,
                                                        .get_default_kernel =
-                                                           syslinux_get_default_kernel,
+                                                           syslinux_common_get_default_kernel,
                                                        .needs_install = syslinux_needs_install,
                                                        .needs_update = syslinux_needs_update,
                                                        .install = syslinux_common_install,
