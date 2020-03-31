@@ -351,14 +351,14 @@ bool sd_class_set_default_kernel(const BootManager *manager, const Kernel *kerne
 
         if (timeout > 0) {
                 /* Set the timeout as configured by the user */
-                item_name = string_printf("timeout %d\ndefault %s-%s-%s-%d\n",
+                item_name = string_printf("timeout %d\ndefault %s-%s-%s-%d.conf\n",
                                           timeout,
                                           prefix,
                                           kernel->meta.ktype,
                                           kernel->meta.version,
                                           kernel->meta.release);
         } else {
-                item_name = string_printf("default %s-%s-%s-%d\n",
+                item_name = string_printf("default %s-%s-%s-%d.conf\n",
                                           prefix,
                                           kernel->meta.ktype,
                                           kernel->meta.version,
