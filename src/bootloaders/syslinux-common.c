@@ -102,6 +102,7 @@ bool syslinux_common_set_default_kernel(const BootManager *manager, const Kernel
         autofree(CbmWriter) *writer = CBM_WRITER_INIT;
         NcHashmapIter iter = { 0 };
         char *initrd_name = NULL;
+        int timeout;
         struct SyslinuxContext *ctx = NULL;
 
         ctx = boot_manager_get_data((BootManager *)manager);
@@ -119,9 +120,13 @@ bool syslinux_common_set_default_kernel(const BootManager *manager, const Kernel
                 abort();
         }
 
+        timeout = boot_manager_get_timeout_value((BootManager *)manager);
+
         /* No default kernel for set timeout */
         if (!default_kernel) {
                 cbm_writer_append(writer, "TIMEOUT 100\n");
+        } else if (timeout > 0) {
+                cbm_writer_append_printf(writer, "TIMEOUT %d\n", timeout);
         }
 
         for (uint16_t i = 0; i < ctx->kernel_queue->len; i++) {
